@@ -1,102 +1,119 @@
 #!/bin/bash
-
-# Renk Tanımlamaları
-YESIL='\033[0;32m'
-MAVI='\033[0;34m'
-KIRMIZI='\033[0;31m'
-BEYAZ='\033[0;37m'
-NC='\033[0m'
-
 clear
-# Havalı QARO Açılış Banner'ı
-echo -e "${YESIL}"
-echo "  ██████╗  █████╗ ██████╗  ██████╗ "
-echo " ██╔═══██╗██╔══██╗██╔══██╗██╔═══██╗"
-echo " ██║   ██║███████║██████╔╝██║   ██║"
-echo " ██║   ██║██╔══██║██╔══██╗██║   ██║"
-echo " ╚██████╔╝██║  ██║██║  ██║╚██████╔╝"
-echo "  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ "
-echo -e " ─────────────────────────────────────────────────────"
-echo -e " ─────────────────────────────────────────────────────────────"
-echo -e "  \033[0;34m[+] Geliştirici: \033[1;37milhamXqaro\033[0m          \033[0;32m[ Sürüm: v2.1 ]\033[0m"
-echo -e " ─────────────────────────────────────────────────────────────"
-echo -e "${NC}"
 
-echo -e "${BEYAZ}[1]${NC} Hedef Sistem Port Tara (Nmap + Firewall Bypass)"
-echo -e "${BEYAZ}[2]${NC} Dış IP Detaylı Konum/ISP Sorgula"
-echo -e "${BEYAZ}[3]${NC} Ağ İçi Aktif Cihazları Tara (Yerel Keşif)"
-echo -e "${BEYAZ}[4]${NC} Kendi IP Adreslerini Gör (Yerel ve Dış)"
-echo -e "${BEYAZ}[5]${NC} Hedef Web Sitesi WHOIS / Kayıt Bilgisi Topla"
-echo -e "${BEYAZ}[6]${NC} Kullanıcı Adı Avcısı (Sosyal Medya OSINT)"
-echo -e "${BEYAZ}[7]${NC} Web Admin Panel Sızma Keşfi (Hızlı Tarama)"
-echo -e "${BEYAZ}[8]${NC} Çıkış"
+echo -e "\033[0;32m ██████╗  █████╗ ██████╗  ██████╗ "
+echo -e "██╔═══██╗██╔══██╗██╔══██╗██╔═══██╗"
+echo -e "██║   ██║███████║██████╔╝██║   ██║"
+echo -e "██║   ██║██╔══██║██╔══██╗██║   ██║"
+echo -e "╚██████╔╝██║  ██║██║  ██║╚██████╔╝"
+echo -e " ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ \033[0m"
+echo -e " ─────────────────────────────────────────────────────────────"
+echo -e "  \033[0;34m[+] Geliştirici: \033[1;37milhamXqaro\033[0m          \033[0;32m[ Sürüm: v2.5 ]\033[0m"
+echo -e " ─────────────────────────────────────────────────────────────"
+
+echo -e "\033[1;37m[1]\033[0m Hedef Sistem Port Tara"
+echo -e "\033[1;37m[2]\033[0m Dış IP Detaylı Konum/ISP"
+echo -e "\033[1;37m[3]\033[0m Ağ İçi Aktif Cihazlar"
+echo -e "\033[1;37m[4]\033[0m Kendi IP Bilgisi"
+echo -e "\033[1;37m[5]\033[0m Hedef WHOIS"
+echo -e "\033[1;37m[6]\033[0m Kullanıcı Adı Avcısı"
+echo -e "\033[1;37m[7]\033[0m Web Admin Panel Sızma"
+echo -e "\033[1;37m[8]\033[0m Sevgiliye Özel Sürpriz (Animasyonlu & Dev Kalp)"
+echo -e "\033[1;37m[9]\033[0m Çıkış"
 echo ""
-echo -n -e "${YESIL}Seçiminiz: ${NC}"
+echo -n -e "\033[0;32mSeçiminiz: \033[0m"
 read secim
 
 case $secim in
-    1)
-        echo -n -e "${MAVI}Hedef IP/Site girin: ${NC}"
-        read hedef
-        echo -e "${YESIL}Taranıyor...${NC}"
+    1) 
+        read -p "Hedef IP: " hedef
         nmap -F -Pn $hedef
+        read -p "Devam etmek için Enter'a bas..."
+        bash qaro.sh 
         ;;
-    2)
-        echo -n -e "${MAVI}Sorgulanacak IP (Kendi IP'niz için boş bırakın): ${NC}"
-        read ip_adresi
-        curl -s "http://ip-api.com/json/$ip_adresi?lang=tr" | grep -E "country|city|isp|as|query"
+    2) 
+        read -p "Dış IP: " ip
+        curl -s https://ipapi.co/$ip/json/
+        echo ""
+        read -p "Devam etmek için Enter'a bas..."
+        bash qaro.sh 
         ;;
-    3)
-        echo -e "${YESIL}Ağ taranıyor...${NC}"
-        local_net=$(ifconfig | grep "inet " | grep -v "127.0.0.1" | awk '{print $2}' | cut -d. -f1-3)
-        if [ -z "$local_net" ]; then echo -e "${KIRMIZI}Bağlantı yok!${NC}"; else nmap -sn $local_net.0/24; fi
+    3) 
+        arp -a
+        read -p "Devam etmek için Enter'a bas..."
+        bash qaro.sh 
         ;;
-    4)
-        echo -e "${YESIL}IP Bilgileriniz:${NC}"
-        echo -e "${MAVI}Dış IP: ${BEYAZ}$(curl -s https://ifconfig.me)${NC}"
-        echo -e "${MAVI}İç IP:  ${BEYAZ}$(ifconfig | grep "inet " | grep -v "127.0.0.1" | awk '{print $2}')${NC}"
+    4) 
+        echo "Yerel IP:"; ifconfig | grep "inet "
+        echo "Dış IP:"; curl -s https://ifconfig.me; echo ""
+        read -p "Devam etmek için Enter'a bas..."
+        bash qaro.sh 
         ;;
-    5)
-        echo -n -e "${MAVI}Hedef Alan Adını Girin (Örn: google.com): ${NC}"
-        read domain
-        echo -e "${YESIL}Whois bilgileri çekiliyor...${NC}"
-        curl -s "https://api.hackertarget.com/whois/?q=$domain" | head -n 25
+    5) 
+        read -p "Domain: " domain
+        whois $domain
+        read -p "Devam etmek için Enter'a bas..."
+        bash qaro.sh 
         ;;
-    6)
-        echo -n -e "${MAVI}Aranacak Kullanıcı Adını Girin: ${NC}"
-        read username
-        echo -e "${YESIL}Platformlar taranıyor (Hesap var mı?)...${NC}"
-        for platform in "instagram.com" "tiktok.com/@" "github.com" "twitter.com" "linktr.ee"
-        do
-            status=$(curl -s -o /dev/null -w "%{http_code}" "https://$platform$username")
-            if [ "$status" == "200" ]; then
-                echo -e "${YESIL}[+] BULUNDU:${NC} https://$platform$username"
-            else
-                echo -e "${BEYAZ}[-] Yok:${NC} $platform"
-            fi
+    6) 
+        read -p "Kullanıcı Adı: " username
+        curl -s -o /dev/null -w "Instagram: %{http_code}\n" https://www.instagram.com/$username
+        curl -s -o /dev/null -w "GitHub: %{http_code}\n" https://github.com/$username
+        read -p "Devam etmek için Enter'a bas..."
+        bash qaro.sh 
+        ;;
+    7) 
+        read -p "Hedef URL (http://...): " site
+        for admin in /admin /login; do 
+            curl -s -o /dev/null -w "$site$admin : %{http_code}\n" $site$admin
         done
+        read -p "Devam etmek için Enter'a bas..."
+        bash qaro.sh 
         ;;
-    7)
-        echo -n -e "${MAVI}Hedef Siteyi Girin (Örn: http://hedef.com): ${NC}"
-        read web_site
-        echo -e "${KIRMIZI}Admin panelleri taranıyor...${NC}"
-        for path in "/admin/" "/administrator/" "/login.php" "/wp-admin/" "/admin.php" "/user/"
-        do
-            status=$(curl -s -o /dev/null -w "%{http_code}" "$web_site$path")
-            if [ "$status" == "200" ] || [ "$status" == "301" ]; then
-                echo -e "${YESIL}[+] PANEL SIZINTISI REAKSİYON VERDİ ($status):${NC} $web_site$path"
-            fi
+    8) 
+        clear
+        echo -e "\033[1;31m" # Parlak kırmızı kalp rengi
+        
+        # İstediğin o satır satır süreli inen devasa kalp efekti
+        echo "         ****** ****** "; sleep 0.4
+        echo "       ********** ********** "; sleep 0.4
+        echo "     ************* ************* "; sleep 0.4
+        echo "     *************************** "; sleep 0.4
+        echo "      ************************* "; sleep 0.4
+        echo "        ********************* "; sleep 0.4
+        echo "          ***************** "; sleep 0.4
+        echo "            ************* "; sleep 0.4
+        echo "              ********* "; sleep 0.4
+        echo "                ***** "; sleep 0.4
+        echo "                  * "; sleep 0.4
+        
+        echo -e "\033[0m"
+        echo ""
+        
+        # Harf harf akan turkuaz renkli yazı
+        echo -e -n "\033[1;36m"
+        mesaj="  >> Kodların arasında siber dünyayı tararken bile sadece sen varsın... <3 <<"
+        for ((i=0; i<${#mesaj}; i++)); do 
+            echo -n "${mesaj:$i:1}"
+            sleep 0.05
         done
+        echo -e "\033[0m"
+        echo ""
+        echo ""
+        read -p "Menüye dönmek için Enter'a bas..."
+        bash qaro.sh 
         ;;
-    8)
-        echo -e "${YESIL}Qaro xsec iyi günler diler!${NC}"
-        exit 0
+    9) 
+        # İstediğin o şık veda ve iyi günler mesajı
+        echo -e "\033[0;33m"
+        echo " ─────────────────────────────────────────────────────────────"
+        echo "  Görüşürüz ortak, siber dünyada kendine iyi bak! "
+        echo "  İyi günler dilerim. "
+        echo " ─────────────────────────────────────────────────────────────"
+        echo -e "\033[0m"
+        exit 0 
         ;;
-    *)
-        echo -e "${KIRMIZI}Geçersiz seçim!${NC}"
+    *) 
+        bash qaro.sh 
         ;;
 esac
-echo ""
-echo -e "${MAVI}Menüye dönmek için Enter'a basın...${NC}"
-read
-./qaro.sh
